@@ -586,6 +586,8 @@ def execute_analysis(dem_file_path, point_cloud_file_path):
 if __name__ == "__main__":
     execute_analysis(dem_file_path, point_cloud_file_path)
 ```
+![image](https://github.com/user-attachments/assets/55c551bd-de98-41f8-9079-12820e13f857)
+
 
 - **Notes:**
 - **Issues/Challenges:**
