@@ -1165,6 +1165,7 @@ The code loads an image from a `.tif` file using the `rasterio` library, convert
 - **Completed Tasks:**
   - [ ] Task 1
   - [ ] Task 2
+  
 #Task 1 results in folder: task1  
 
 #Task 1 in python
