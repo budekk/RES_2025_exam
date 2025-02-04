@@ -54,7 +54,7 @@ perform accuracy analysis using https://github.com/RemoteSys/accuracy
   - [ ] Task 3
 
 
-- **Code Implementation:**
+- **Code Implementation for Task3:**
   The following Python script calculates accuracy metrics.
 
   ```python
@@ -162,6 +162,75 @@ results
 ![Screenshot2](screen2.png)
 
 ---
+```python
+
+import rasterio
+import numpy as np
+import geopandas as gpd
+
+# Ścieżki do plików
+dem_file = path
+point_cloud_file = path
+
+def load_dem(file_path):
+    """Wczytuje dane DEM oraz macierz transformacji."""
+    with rasterio.open(file_path) as src:
+        elevation_data = src.read(1)  # Pobranie pierwszego pasma
+        affine_transform = src.transform
+    return elevation_data, affine_transform
+
+def load_point_cloud(file_path):
+    """Wczytuje chmurę punktów z pliku wektorowego (SHP)."""
+    return gpd.read_file(file_path)
+
+def extract_dem_elevation(elevation_data, transform, x_coord, y_coord):
+    """Interpoluje wysokość DEM dla podanych współrzędnych."""
+    col, row = ~transform * (x_coord, y_coord)  # Transformacja współrzędnych
+    row, col = round(row), round(col)
+    
+    if 0 <= row < elevation_data.shape[0] and 0 <= col < elevation_data.shape[1]:
+        return elevation_data[row, col]
+    return np.nan  # Wartość poza zakresem
+
+def compute_height_differences(dem_data, transform, points):
+    """Oblicza różnice wysokości między chmurą punktów a DEM."""
+    points['DEM_Height'] = points.apply(lambda p: extract_dem_elevation(dem_data, transform, p.geometry.x, p.geometry.y), axis=1)
+    points['Height_Diff'] = points['Z'] - points['DEM_Height']
+    return points
+
+def evaluate_accuracy(errors):
+    """Oblicza metryki dokładnościowe na podstawie różnic wysokości."""
+    height_diff = errors['Height_Diff'].dropna()
+    mean_err = np.mean(height_diff)
+    rmse_val = np.sqrt(np.mean(height_diff ** 2))
+    std_dev_val = np.std(height_diff)
+    
+    return {
+        'Mean Error': mean_err,
+        'RMSE': rmse_val,
+        'Standard Deviation': std_dev_val
+    }
+
+def display_metrics(results):
+    """Wyświetla wyniki dokładności."""
+    print("\n--- Accuracy Metrics ---")
+    print(f"Mean Error: {results['Mean Error']:.2f} m")
+    print(f"RMSE: {results['RMSE']:.2f} m")
+    print(f"Standard Deviation: {results['Standard Deviation']:.2f} m")
+
+def main(dem_file, point_cloud_file):
+    """Główna funkcja przetwarzania danych."""
+    dem_data, affine = load_dem(dem_file)
+    point_cloud = load_point_cloud(point_cloud_file)
+    processed_points = compute_height_differences(dem_data, affine, point_cloud)
+    accuracy_results = evaluate_accuracy(processed_points)
+    display_metrics(accuracy_results)
+    return processed_points, accuracy_results
+
+if __name__ == "__main__":
+    main(dem_file, point_cloud_file)
+
+```
 
 ### 3.2 Member 2 - Aleksandra Barnach 
 - **Completed Tasks:**
