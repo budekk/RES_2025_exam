@@ -1011,10 +1011,252 @@ This code loads elevation model (DEM) data and a 3D point cloud in shapefile for
 
 ---
 
-### 3.5 Member 5 - Full Name
+### 3.5 Member 5 - Maciej Grzybacz
 - **Completed Tasks:**
   - [ ] Task 1
   - [ ] Task 2
+#Task 1 in python
+
+
+Reading files
+
+Displaying images
+
+import cv2
+# Open the TIFF file
+
+tif_1_lst = cv2.imread("t1_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+tif_1_ndvi = cv2.imread("t1_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+
+tif_2_lst =  cv2.imread("t2_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+tif_2_ndvi = cv2.imread("t2_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+
+
+import matplotlib.pyplot as plt
+
+# basic viridis palette
+# Define a color palette
+cmap = 'viridis'  # You can use other colormaps like 'gray', 'hot', 'cool', etc.
+
+# Display the images
+fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+
+axs[0, 0].imshow(tif_1_lst, cmap=cmap)
+axs[0, 0].set_title('TIF 1 LST')
+
+axs[0, 1].imshow(tif_1_ndvi, cmap=cmap)
+axs[0, 1].set_title('TIF 1 NDVI')
+
+axs[1, 0].imshow(tif_2_lst, cmap=cmap)
+axs[1, 0].set_title('TIF 2 LST')
+
+axs[1, 1].imshow(tif_2_ndvi, cmap=cmap)
+axs[1, 1].set_title('TIF 2 NDVI')
+Text(0.5, 1.0, 'TIF 2 NDVI')
+
+RGB
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Open the TIFF files
+tif_1_lst = cv2.imread("t1_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_1_ndvi = cv2.imread("t1_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_2_lst = cv2.imread("t2_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_2_ndvi = cv2.imread("t2_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+# Create a function to apply RGB palette
+def apply_rgb_palette(image):
+    # Normalize the image data to [0, 1] range
+    norm_image = cv2.normalize(image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    # Apply a colormap
+    colormap = plt.cm.get_cmap('jet')  
+    colored_image = colormap(norm_image)
+    # Convert to RGB (from RGBA)
+    rgb_image = (colored_image[:, :, :3] * 255).astype(np.uint8)
+    return rgb_image
+
+# Apply the RGB palette to the images
+rgb_tif_1_lst = apply_rgb_palette(tif_1_lst)
+rgb_tif_1_ndvi = apply_rgb_palette(tif_1_ndvi)
+rgb_tif_2_lst = apply_rgb_palette(tif_2_lst)
+rgb_tif_2_ndvi = apply_rgb_palette(tif_2_ndvi)
+
+# Display the RGB images
+fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+
+axs[0, 0].imshow(rgb_tif_1_lst)
+axs[0, 0].set_title('RGB TIF 1 LST')
+
+axs[0, 1].imshow(rgb_tif_1_ndvi)
+axs[0, 1].set_title('RGB TIF 1 NDVI')
+
+axs[1, 0].imshow(rgb_tif_2_lst)
+axs[1, 0].set_title('RGB TIF 2 LST')
+
+axs[1, 1].imshow(rgb_tif_2_ndvi)
+axs[1, 1].set_title('RGB TIF 2 NDVI')
+
+# Remove axis ticks
+for ax in axs.flat:
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+plt.tight_layout()
+plt.show()
+C:\Users\grzybaczm\AppData\Local\Temp\ipykernel_18712\4225379860.py:16: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  colormap = plt.cm.get_cmap('jet')  # You can use other colormaps like 'viridis', 'plasma', etc.
+
+Grayscale
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Open the TIFF files
+tif_1_lst = cv2.imread("t1_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_1_ndvi = cv2.imread("t1_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_2_lst = cv2.imread("t2_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_2_ndvi = cv2.imread("t2_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+# Function to display the image in grayscale
+def display_grayscale(image):
+    plt.imshow(image, cmap='gray')
+    plt.axis('off')
+
+# Display the grayscale images
+fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+
+axs[0, 0].imshow(tif_1_lst, cmap='gray')
+axs[0, 0].set_title('Grayscale TIF 1 LST')
+
+axs[0, 1].imshow(tif_1_ndvi, cmap='gray')
+axs[0, 1].set_title('Grayscale TIF 1 NDVI')
+
+axs[1, 0].imshow(tif_2_lst, cmap='gray')
+axs[1, 0].set_title('Grayscale TIF 2 LST')
+
+axs[1, 1].imshow(tif_2_ndvi, cmap='gray')
+axs[1, 1].set_title('Grayscale TIF 2 NDVI')
+
+# Remove axis ticks
+for ax in axs.flat:
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+plt.tight_layout()
+plt.show()
+
+# Function to plot a histogram for an image
+def plot_histogram(image, title, ax):
+    ax.hist(image.ravel(), bins=256, color='blue', alpha=0.7)
+    ax.set_title(title)
+    ax.set_xlim(0, 255)
+
+# Plot histograms for all four TIFF files
+fig, axs = plt.subplots(2, 2, figsize=(12, 12))
+plot_histogram(tif_1_lst, 'Histogram TIF 1 LST', axs[0, 0])
+plot_histogram(tif_1_ndvi, 'Histogram TIF 1 NDVI', axs[0, 1])
+plot_histogram(tif_2_lst, 'Histogram TIF 2 LST', axs[1, 0])
+plot_histogram(tif_2_ndvi, 'Histogram TIF 2 NDVI', axs[1, 1])
+plt.tight_layout()
+plt.show()
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Open the TIFF files
+tif_1_lst = cv2.imread("t1_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_1_ndvi = cv2.imread("t1_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_2_lst = cv2.imread("t2_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+tif_2_ndvi = cv2.imread("t2_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+# Function to create a scatter plot
+def create_scatter_plot(ndvi_image, lst_image, title, ax):
+    ndvi_flat = ndvi_image.ravel()
+    lst_flat = lst_image.ravel()
+    ax.scatter(ndvi_flat, lst_flat, alpha=0.5, s=1)
+    ax.set_title(title)
+    ax.set_xlabel('NDVI')
+    ax.set_ylabel('Temperature (LST)')
+
+# Create scatter plots for the two sets of images
+fig, axs = plt.subplots(1, 2, figsize=(14, 7))
+create_scatter_plot(tif_1_ndvi, tif_1_lst, 'Scatter Plot TIF 1', axs[0])
+create_scatter_plot(tif_2_ndvi, tif_2_lst, 'Scatter Plot TIF 2', axs[1])
+
+plt.tight_layout()
+plt.show()
+
+
+#task 1 in matlab
+
+% Open the TIFF files
+tif_1_lst = imread('t1_lst2023_Jul_Aug.tif');
+tif_1_ndvi = imread('t1_ndvi2023_Jul_Aug.tif');
+tif_2_lst = imread('t2_lst2023_Jul_Aug.tif');
+tif_2_ndvi = imread('t2_ndvi2023_Jul_Aug.tif');
+
+% Function to display an image in grayscale
+function display_grayscale(image, titleText, ax)
+    imshow(image, [], 'Parent', ax);
+    colormap(ax, gray);
+    title(ax, titleText);
+    ax.XTick = [];
+    ax.YTick = [];
+end
+
+% Function to plot a histogram for an image
+function plot_histogram(image, titleText, ax)
+    histogram(ax, image(:), 'BinLimits', [0, 255], 'FaceColor', 'blue', 'FaceAlpha', 0.7);
+    title(ax, titleText);
+    xlim(ax, [0, 255]);
+end
+
+% Plot histograms for all four TIFF files
+figure;
+subplot(2, 2, 1);
+plot_histogram(tif_1_lst, 'Histogram TIF 1 LST', gca);
+subplot(2, 2, 2);
+plot_histogram(tif_1_ndvi, 'Histogram TIF 1 NDVI', gca);
+subplot(2, 2, 3);
+plot_histogram(tif_2_lst, 'Histogram TIF 2 LST', gca);
+subplot(2, 2, 4);
+plot_histogram(tif_2_ndvi, 'Histogram TIF 2 NDVI', gca);
+
+% Display the grayscale images
+figure;
+subplot(2, 2, 1);
+display_grayscale(tif_1_lst, 'Grayscale TIF 1 LST', gca);
+subplot(2, 2, 2);
+display_grayscale(tif_1_ndvi, 'Grayscale TIF 1 NDVI', gca);
+subplot(2, 2, 3);
+display_grayscale(tif_2_lst, 'Grayscale TIF 2 LST', gca);
+subplot(2, 2, 4);
+display_grayscale(tif_2_ndvi, 'Grayscale TIF 2 NDVI', gca);
+
+% Function to create a scatter plot
+function create_scatter_plot(ndvi_image, lst_image, titleText, ax)
+    scatter(ax, double(ndvi_image(:)), double(lst_image(:)), 1, 'filled', 'MarkerFaceAlpha', 0.5);
+    title(ax, titleText);
+    xlabel(ax, 'NDVI');
+    ylabel(ax, 'Temperature (LST)');
+end
+
+% Create scatter plots for the two sets of images
+figure;
+subplot(1, 2, 1);
+create_scatter_plot(tif_1_ndvi, tif_1_lst, 'Scatter Plot TIF 1', gca);
+subplot(1, 2, 2);
+create_scatter_plot(tif_2_ndvi, tif_2_lst, 'Scatter Plot TIF 2', gca);
+
+  
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
