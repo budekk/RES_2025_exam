@@ -1165,7 +1165,8 @@ The code loads an image from a `.tif` file using the `rasterio` library, convert
 - **Completed Tasks:**
   - [ ] Task 1
   - [ ] Task 2
-  
+#Task 1 results in folder: task1  
+
 #Task 1 in python
 
 ```
@@ -1481,6 +1482,8 @@ def execute_analysis(dem_file_path, point_cloud_file_path):
 if __name__ == "__main__":
     execute_analysis(dem_file_path, point_cloud_file_path)
 ```
+![image](https://github.com/user-attachments/assets/412447f5-0416-4931-a620-a4d449100ec8)
+
 ---
 
 ## 4. Conclusions and Recommendations
