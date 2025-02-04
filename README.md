@@ -701,7 +701,7 @@ if __name__ == "__main__":
   ```
 
 
-![Screenshot5](task2.png)
+![Screenshot5](task2.jpg)
 
 
 This code imports elevation model (DEM) data and a 3D point cloud in shapefile format, then computes the elevation differences between the DEM values and the points in the cloud. Based on these differences, accuracy metrics such as mean error, RMSE (root mean square error), and standard deviation are derived. The results indicate an average height difference of 4.05 meters, which represents a substantial error. The RMSE of 9.25 meters highlights a significant variation, while the standard deviation of 8.31 meters reveals a broad range of errors across the examined points.
