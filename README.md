@@ -334,7 +334,7 @@ plt.show()
   - [ ] Task 2
   - [ ] Task 3
 
-- **Code Implementation:**
+- **Code Implementation for Task3:**
   The following Python script calculates K-means classification.
 
 ```python
@@ -681,6 +681,78 @@ if __name__ == "__main__":
     execute_analysis(dem_file_path, point_cloud_file_path)
 ```
 ![image](https://github.com/user-attachments/assets/55c551bd-de98-41f8-9079-12820e13f857)
+
+- **Code Implementation for Task2:**
+```
+
+import rasterio
+import numpy as np
+import geopandas as gpd
+
+# Ścieżki do danych
+sciezka_dem = path
+sciezka_chmury_punktow = path
+
+def wczytaj_dem(sciezka):
+    """Odczytuje dane DEM i zwraca macierz wysokości oraz transformację."""
+    with rasterio.open(sciezka) as plik:
+        wysokosci = plik.read(1)
+        transformacja = plik.transform
+    return wysokosci, transformacja
+
+def wczytaj_chmure_punktow(sciezka):
+    """Wczytuje plik wektorowy zawierający chmurę punktów."""
+    return gpd.read_file(sciezka)
+
+def interpoluj_wysokosc(wysokosci, transformacja, x, y):
+    """Pobiera wysokość z DEM na podstawie współrzędnych."""
+    kolumna, wiersz = ~transformacja * (x, y)
+    wiersz, kolumna = round(wiersz), round(kolumna)
+    
+    if 0 <= wiersz < wysokosci.shape[0] and 0 <= kolumna < wysokosci.shape[1]:
+        return wysokosci[wiersz, kolumna]
+    return np.nan
+
+def oblicz_roznice_wysokosci(dem, transformacja, punkty):
+    """Dodaje do tabeli wysokości z DEM oraz różnice wysokości."""
+    punkty['Wysokosc_DEM'] = punkty.apply(lambda pkt: interpoluj_wysokosc(dem, transformacja, pkt.geometry.x, pkt.geometry.y), axis=1)
+    punkty['Roznica_Wysokosci'] = punkty['Z'] - punkty['Wysokosc_DEM']
+    return punkty
+
+def oblicz_metryki(roznice):
+    """Wylicza statystyki błędu dla różnic wysokości."""
+    blad = roznice['Roznica_Wysokosci'].dropna()
+    return {
+        'Sredni Blad': np.mean(blad),
+        'RMSE': np.sqrt(np.mean(blad ** 2)),
+        'Odchylenie Standardowe': np.std(blad)
+    }
+
+def wyswietl_metryki(metryki):
+    """Wyświetla wyniki dokładności w czytelnej formie."""
+    print("\n--- Metryki Dokładności ---")
+    for klucz, wartosc in metryki.items():
+        print(f"{klucz}: {wartosc:.2f} m")
+
+def przetwarzaj_dane(sciezka_dem, sciezka_chmury):
+    """Główna funkcja obsługi przetwarzania danych wysokościowych."""
+    dem, transformacja = wczytaj_dem(sciezka_dem)
+    chmura_punktow = wczytaj_chmure_punktow(sciezka_chmury)
+    punkty_przetworzone = oblicz_roznice_wysokosci(dem, transformacja, chmura_punktow)
+    wyniki_dokladnosci = oblicz_metryki(punkty_przetworzone)
+    wyswietl_metryki(wyniki_dokladnosci)
+    return punkty_przetworzone, wyniki_dokladnosci
+
+if __name__ == "__main__":
+    przetwarzaj_dane(sciezka_dem, sciezka_chmury_punktow)
+
+```
+![Screenshot5](task2.png)
+
+
+This code imports elevation model (DEM) data and a 3D point cloud in shapefile format, then computes the elevation differences between the DEM values and the points in the cloud. Based on these differences, accuracy metrics such as mean error, RMSE (root mean square error), and standard deviation are derived. The results indicate an average height difference of 4.05 meters, which represents a substantial error. The RMSE of 9.25 meters highlights a significant variation, while the standard deviation of 8.31 meters reveals a broad range of errors across the examined points.
+
+
 
 
 - **Notes:**
