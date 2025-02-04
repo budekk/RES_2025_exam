@@ -160,6 +160,7 @@ results
 ```
 ![Screenshot1](screen1.png)
 ![Screenshot2](screen2.png)
+![Screenshot2](screen3.png)
 
 ---
 # Task2
@@ -327,6 +328,11 @@ scatter_plot(ndvi_img_2, lst_img_2, "Wykres rozrzutu - Obraz 2", axes[1])
 plt.tight_layout()
 plt.show()
 ```
+![Screenshot1](b1.jpg)
+![Screenshot1](b2.jpg)
+![Screenshot1](b3.jpg)
+![Screenshot1](b4.jpg)
+
 
 ### 3.2 Member 2 - Aleksandra Barnach 
 - **Completed Tasks:**
