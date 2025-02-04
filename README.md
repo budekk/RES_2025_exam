@@ -158,8 +158,8 @@ for path in file_paths:
 
 results
 ```
-![SYF1](./images/screen1.png)
-![SYF2](./images/screen2.png)
+![Screenshot1](screen1.png)
+![Screenshot2](screen2.png)
 
 ---
 
