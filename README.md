@@ -57,10 +57,10 @@ perform accuracy analysis using https://github.com/RemoteSys/accuracy
 
 ---
 
-### 3.2 Member 2 - Full Name
+### 3.2 Member 2 - Aleksandra Barnach 
 - **Completed Tasks:**
-  - [ ] Task 1
-  - [ ] Task 2
+  - [ ] Task 3.1
+  - [ ] Task 3.3
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
