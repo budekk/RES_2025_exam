@@ -247,6 +247,76 @@ if __name__ == "__main__":
 - **Completed Tasks:**
   - [ ] Task 1
   - [ ] Task 2
+  
+ ```python
+import rasterio
+import numpy as np
+import geopandas as gpd
+
+# Nowe ścieżki
+dem_file_path = "C:/Projekty/exam/DEM/Lubin_2024_03_27.asc"
+point_cloud_file_path = "C:/Projekty/exam/Lubin_2024_03_27_pc_t2.shp"
+
+# Funkcja do odczytu DEM
+def load_dem(dem_file_path):
+    with rasterio.open(dem_file_path) as dem_file:
+        dem_array = dem_file.read(1)  # Odczyt pierwszej warstwy
+        transform_info = dem_file.transform
+    return dem_array, transform_info
+
+# Funkcja do odczytu chmury punktów
+def load_point_cloud(point_cloud_file_path):
+    point_cloud_df = gpd.read_file(point_cloud_file_path)  # Wczytanie SHP
+    return point_cloud_df
+
+# Funkcja do interpolacji wysokości DEM dla podanych współrzędnych
+def get_dem_height_at_coords(dem_array, transform_info, x, y):
+    col, row = ~transform_info * (x, y)  # Przemiana współrzędnych
+    row, col = int(round(row)), int(round(col))
+    if 0 <= row < dem_array.shape[0] and 0 <= col < dem_array.shape[1]:
+        return dem_array[row, col]
+    return np.nan  # Jeśli współrzędne poza zakresem DEM
+
+# Funkcja do obliczania różnic wysokości
+def compute_height_differences(dem_array, transform_info, point_cloud_df):
+    point_cloud_df['DEM_Height'] = point_cloud_df.apply(lambda point: get_dem_height_at_coords(dem_array, transform_info, point.geometry.x, point.geometry.y), axis=1)
+    point_cloud_df['Height_Difference'] = point_cloud_df['Z'] - point_cloud_df['DEM_Height']
+    return point_cloud_df
+
+# Funkcja do obliczania metryk dokładności
+def compute_accuracy_metrics(differences_df):
+    height_diff = differences_df['Height_Difference'].dropna()
+    mean_error = np.mean(height_diff)
+    root_mean_square_error = np.sqrt(np.mean(height_diff ** 2))
+    standard_deviation = np.std(height_diff)
+    return {
+        'Mean Error': mean_error,
+        'RMSE': root_mean_square_error,
+        'Standard Deviation': standard_deviation
+    }
+
+# Funkcja do wyświetlania metryk
+def display_metrics(metrics_dict):
+    print("\n--- Accuracy Metrics ---")
+    for metric, value in metrics_dict.items():
+        print(f"{metric}: {value:.2f} meters")
+
+# Główna funkcja
+def execute_analysis(dem_file_path, point_cloud_file_path):
+    dem_array, transform_info = load_dem(dem_file_path)
+    point_cloud_df = load_point_cloud(point_cloud_file_path)
+    differences_df = compute_height_differences(dem_array, transform_info, point_cloud_df)
+    accuracy_metrics = compute_accuracy_metrics(differences_df)
+    display_metrics(accuracy_metrics)
+    return differences_df, accuracy_metrics
+
+# Uruchomienie programu
+if __name__ == "__main__":
+    execute_analysis(dem_file_path, point_cloud_file_path)
+
+
+``
+
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
