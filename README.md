@@ -254,7 +254,7 @@ import rasterio
 import numpy as np
 import geopandas as gpd
 
-# Nowe ścieżki
+
 dem_file_path = "C:/Projekty/exam/DEM/Lubin_2024_03_27.asc"
 point_cloud_file_path = "C:/Projekty/exam/Lubin_2024_03_27_pc_t2.shp"
 
@@ -316,7 +316,7 @@ if __name__ == "__main__":
     execute_analysis(dem_file_path, point_cloud_file_path)
 
 
-```
+```python
 
 - **Notes:**
 - **Issues/Challenges:**
