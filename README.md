@@ -251,8 +251,8 @@ results
     main(dem_path, point_cloud_path)
 ``
   
-
-  - [ ] ![image](https://github.com/user-attachments/assets/ad29c30e-c511-464d-a10c-5eedc9d92a4b)
+![image](https://github.com/user-attachments/assets/ad29c30e-c511-464d-a10c-5eedc9d92a4b)
+This code loads elevation model (DEM) data and a 3D point cloud in shapefile format, and then calculates the elevation differences between the DEM values and the points in the cloud. From these differences, accuracy metrics such as mean error, RMSE (root mean square error) and standard deviation are calculated. The results show an average height difference of 4.05 meters, which is quite a large error. The RMSE is 9.25 meters, suggesting a significant discrepancy, and the standard deviation of 8.31 meters indicates a wide spread of errors at the analyzed points.
 
 - **Notes:**
 - **Issues/Challenges:**
