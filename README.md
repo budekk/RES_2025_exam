@@ -162,6 +162,67 @@ results
 ![Screenshot2](screen2.png)
 ![Screenshot2](screen3.png)
 
+
+```python
+# Instalacja wymaganej biblioteki
+!pip install rasterio
+
+# Importowanie niezbędnych modułów
+import rasterio
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+print("Pomyślnie zaimportowano wszystkie biblioteki!")
+
+# Ścieżka do pliku wejściowego
+input_tiff = "/content/raster.tif"
+
+# Wczytanie danych rastrowych
+with rasterio.open(input_tiff) as dataset:
+    raster_data = dataset.read()  # Wczytanie wszystkich pasm
+    metadata = dataset.profile  # Pobranie metadanych
+
+# Przekształcenie macierzy 3D na 2D (piksele x kanały)
+bands, rows, cols = raster_data.shape
+reshaped_data = raster_data.reshape(bands, -1).T  # Obrót dla algorytmu K-Means
+
+# Filtrowanie pikseli o wartościach zerowych lub NaN
+valid_mask = np.all(reshaped_data > 0, axis=1)
+cleaned_data = reshaped_data[valid_mask]
+
+# Grupowanie danych przy użyciu algorytmu K-Means (np. 5 klas)
+num_clusters = 5
+kmeans_model = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
+kmeans_model.fit(cleaned_data)
+
+# Przypisanie etykiet do każdego piksela
+cluster_labels = np.full(reshaped_data.shape[0], -1)  # Domyślnie -1 dla odrzuconych pikseli
+cluster_labels[valid_mask] = kmeans_model.labels_
+
+# Odtworzenie macierzy do pierwotnych wymiarów obrazu
+classified_raster = cluster_labels.reshape(rows, cols)
+
+# Wizualizacja wyników
+plt.figure(figsize=(10, 10))
+plt.imshow(classified_raster, cmap='tab10')
+plt.colorbar(label="Grupa klastra")
+plt.title("Klasyfikacja K-Means obrazu rastrowego")
+plt.show()
+
+# Zapis przetworzonego obrazu
+output_tiff = "/content/classified_output.tif"
+with rasterio.open(
+    output_tiff, 'w', driver='GTiff',
+    height=rows, width=cols, count=1,
+    dtype=rasterio.uint8, crs=metadata['crs'],
+    transform=metadata['transform']
+) as output_file:
+    output_file.write(classified_raster.astype(rasterio.uint8), 1)
+
+print(f"Zapisano sklasyfikowany obraz do {output_tiff}")
+```
+![Screenshot1](scr5.png)
 ---
 # Task2
 ```python
@@ -235,103 +296,59 @@ if __name__ == "__main__":
 ```
 ![Screenshot1](task2_budek.jpg)
 
-#Task 1
+# Task 1
 
 ```python
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Wczytanie plików TIFF
-lst_img_1 = cv2.imread("t1_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
-ndvi_img_1 = cv2.imread("t1_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
-lst_img_2 = cv2.imread("t2_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
-ndvi_img_2 = cv2.imread("t2_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+# Wczytanie jednego pliku TIFF
+file_path = "t1_lst2023_Jul_Aug.tif"
+tiff_image = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
 
-# Funkcja do wyświetlania obrazów w skali szarości
-def show_grayscale(image, title, ax):
-    ax.imshow(image, cmap='gray')
-    ax.set_title(title)
-    ax.axis('off')
+# Funkcja do wyświetlenia obrazu w skali szarości
+def show_grayscale(image, title):
+    plt.figure(figsize=(6, 6))
+    plt.imshow(image, cmap='gray')
+    plt.title(title)
+    plt.axis('off')
+    plt.show()
 
-# Wyświetlenie obrazów
-fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+# Funkcja do przekształcenia obrazu na RGB
+def apply_rgb_palette(image):
+    norm_image = cv2.normalize(image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    colormap = plt.colormaps.get_cmap('jet')
+    colored_image = colormap(norm_image)
+    return (colored_image[:, :, :3] * 255).astype(np.uint8)
 
-show_grayscale(lst_img_1, "LST - Obraz 1", axes[0, 0])
-show_grayscale(ndvi_img_1, "NDVI - Obraz 1", axes[0, 1])
-show_grayscale(lst_img_2, "LST - Obraz 2", axes[1, 0])
-show_grayscale(ndvi_img_2, "NDVI - Obraz 2", axes[1, 1])
+# Funkcja do wyświetlenia histogramu
+def plot_histogram(image, title):
+    plt.figure(figsize=(6, 4))
+    plt.hist(image.ravel(), bins=256, color='blue', alpha=0.7)
+    plt.title(title)
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+    plt.show()
 
-plt.tight_layout()
+# Wyświetlenie obrazu w skali szarości
+show_grayscale(tiff_image, "Grayscale TIFF Image")
+
+# Konwersja do RGB i wyświetlenie
+rgb_image = apply_rgb_palette(tiff_image)
+plt.figure(figsize=(6, 6))
+plt.imshow(rgb_image)
+plt.title("RGB TIFF Image")
+plt.axis('off')
 plt.show()
 
-# Funkcja do normalizacji i konwersji do palety kolorów RGB
-def convert_to_rgb(image):
-    norm_img = cv2.normalize(image, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-    colormap = plt.get_cmap('jet')
-    rgb_img = colormap(norm_img)
-    return (rgb_img[:, :, :3] * 255).astype(np.uint8)
+# Wyświetlenie histogramu
+plot_histogram(tiff_image, "Histogram TIFF Image")
 
-# Konwersja obrazów
-rgb_lst_1 = convert_to_rgb(lst_img_1)
-rgb_ndvi_1 = convert_to_rgb(ndvi_img_1)
-rgb_lst_2 = convert_to_rgb(lst_img_2)
-rgb_ndvi_2 = convert_to_rgb(ndvi_img_2)
 
-# Wyświetlenie obrazów RGB
-fig, axes = plt.subplots(2, 2, figsize=(10, 10))
-
-axes[0, 0].imshow(rgb_lst_1)
-axes[0, 0].set_title("RGB LST - Obraz 1")
-axes[0, 1].imshow(rgb_ndvi_1)
-axes[0, 1].set_title("RGB NDVI - Obraz 1")
-axes[1, 0].imshow(rgb_lst_2)
-axes[1, 0].set_title("RGB LST - Obraz 2")
-axes[1, 1].imshow(rgb_ndvi_2)
-axes[1, 1].set_title("RGB NDVI - Obraz 2")
-
-for ax in axes.flat:
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-plt.tight_layout()
-plt.show()
-
-# Funkcja do tworzenia histogramu
-def plot_hist(image, title, ax):
-    ax.hist(image.ravel(), bins=256, color='blue', alpha=0.7)
-    ax.set_title(title)
-    ax.set_xlim(0, 255)
-
-# Tworzenie histogramów
-fig, axes = plt.subplots(2, 2, figsize=(12, 12))
-plot_hist(lst_img_1, "Histogram LST - Obraz 1", axes[0, 0])
-plot_hist(ndvi_img_1, "Histogram NDVI - Obraz 1", axes[0, 1])
-plot_hist(lst_img_2, "Histogram LST - Obraz 2", axes[1, 0])
-plot_hist(ndvi_img_2, "Histogram NDVI - Obraz 2", axes[1, 1])
-
-plt.tight_layout()
-plt.show()
-
-# Funkcja do tworzenia wykresu rozrzutu
-def scatter_plot(ndvi, lst, title, ax):
-    ax.scatter(ndvi.ravel(), lst.ravel(), alpha=0.5, s=1)
-    ax.set_title(title)
-    ax.set_xlabel("NDVI")
-    ax.set_ylabel("LST")
-
-# Tworzenie wykresów rozrzutu
-fig, axes = plt.subplots(1, 2, figsize=(14, 7))
-scatter_plot(ndvi_img_1, lst_img_1, "Wykres rozrzutu - Obraz 1", axes[0])
-scatter_plot(ndvi_img_2, lst_img_2, "Wykres rozrzutu - Obraz 2", axes[1])
-
-plt.tight_layout()
-plt.show()
 ```
-![Screenshot1](b1.jpg)
-![Screenshot1](b2.jpg)
-![Screenshot1](b3.jpg)
-![Screenshot1](b4.jpg)
+![Screenshot1](scr1.png)
+![Screenshot](hist1.png)
 
 
 ### 3.2 Member 2 - Aleksandra Barnach 
