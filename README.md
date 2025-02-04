@@ -66,6 +66,8 @@ perform accuracy analysis using https://github.com/RemoteSys/accuracy
   !accuracy /content/data2cols.csv
   !accuracy /content/data2cols.csv -f "ac = (TP * TN - FP * FN) / ((TP + FP) * (TP + FN))**0.5"
   import pandas as pd
+```python
+
 import numpy as np
 
 df = pd.read_csv("/content/data2cols.csv")
@@ -155,6 +157,7 @@ for path in file_paths:
         results[path] = f"Error loading file: {e}"
 
 results
+```
 ---
 
 ### 3.2 Member 2 - Aleksandra Barnach 
