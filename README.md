@@ -173,7 +173,7 @@ results
 
 ---
 
-### 3.3 Member 3 - Full Name
+### 3.3 Member 3 - Wiktoria Gądek
 - **Completed Tasks:**
   - [ ] Task 1
   - [ ] Task 2
