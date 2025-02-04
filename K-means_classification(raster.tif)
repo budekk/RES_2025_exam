@@ -1,0 +1,51 @@
+!pip install rasterio
+import rasterio
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+# Ścieżka do pliku
+raster_path = "/content/raster.tif"
+
+# Odczytanie pliku GeoTIFF
+with rasterio.open(raster_path) as src:
+    image = src.read()  # Załaduj wszystkie pasma (bands)
+    profile = src.profile  # Zapisz metadane
+
+# Przekształcenie danych na format 2D (piksele x kanały)
+num_bands, height, width = image.shape
+image_2d = image.reshape(num_bands, -1).T  # Transponowanie dla K-Means
+
+# Usunięcie NaN i wartości zerowych
+valid_pixels = np.all(image_2d > 0, axis=1)
+filtered_data = image_2d[valid_pixels]
+
+# Klasyfikacja K-Means (np. 5 klas)
+kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+kmeans.fit(filtered_data)
+
+# Przypisanie etykiet do pikseli
+labels = np.full(image_2d.shape[0], -1)  # Domyślnie -1 dla odfiltrowanych pikseli
+labels[valid_pixels] = kmeans.labels_
+
+# Rekonstrukcja do oryginalnych wymiarów
+classified_image = labels.reshape(height, width)
+
+# Wizualizacja
+plt.figure(figsize=(10, 10))
+plt.imshow(classified_image, cmap='tab10')
+plt.colorbar(label='Cluster Label')
+plt.title("Sentinel-2 K-Means Classification")
+plt.show()
+
+# Zapis wyników
+output_path = "/content/classified.tif"
+with rasterio.open(
+    output_path, 'w', driver='GTiff',
+    height=height, width=width, count=1,
+    dtype=rasterio.uint8, crs=profile['crs'],
+    transform=profile['transform']
+) as dst:
+    dst.write(classified_image.astype(rasterio.uint8), 1)
+
+print(f"Classified image saved to {output_path}")
