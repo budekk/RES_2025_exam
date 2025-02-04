@@ -165,8 +165,155 @@ results
 
 ### 3.2 Member 2 - Aleksandra Barnach 
 - **Completed Tasks:**
-  - [ ] Task 3.1
-  - [ ] Task 3.3
+  - [ ] Task 1
+  - [ ] Task 2
+  - [X] Task 3
+
+ - **K-means Code Implementation:**
+  The following Python script calculates K-means classification.
+
+  ```python
+!pip install rasterio
+import rasterio
+print("Rasterio imported successfully!")
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+# Ścieżka do pliku
+raster_path = "/content/raster.tif"
+
+# Odczytanie pliku GeoTIFF
+with rasterio.open(raster_path) as src:
+    image = src.read()  # Załaduj wszystkie pasma (bands)
+    profile = src.profile  # Zapisz metadane
+
+# Przekształcenie danych na format 2D (piksele x kanały)
+num_bands, height, width = image.shape
+image_2d = image.reshape(num_bands, -1).T  # Transponowanie dla K-Means
+
+# Usunięcie NaN i wartości zerowych
+valid_pixels = np.all(image_2d > 0, axis=1)
+filtered_data = image_2d[valid_pixels]
+
+# Klasyfikacja K-Means (np. 5 klas)
+kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+kmeans.fit(filtered_data)
+
+# Przypisanie etykiet do pikseli
+labels = np.full(image_2d.shape[0], -1)  # Domyślnie -1 dla odfiltrowanych pikseli
+labels[valid_pixels] = kmeans.labels_
+
+# Rekonstrukcja do oryginalnych wymiarów
+classified_image = labels.reshape(height, width)
+
+# Wizualizacja
+plt.figure(figsize=(10, 10))
+plt.imshow(classified_image, cmap='tab10')
+plt.colorbar(label='Cluster Label')
+plt.title("Sentinel-2 K-Means Classification")
+plt.show()
+
+# Zapis wyników
+output_path = "/content/classified.tif"
+with rasterio.open(
+    output_path, 'w', driver='GTiff',
+    height=height, width=width, count=1,
+    dtype=rasterio.uint8, crs=profile['crs'],
+    transform=profile['transform']
+) as dst:
+    dst.write(classified_image.astype(rasterio.uint8), 1)
+
+print(f"Classified image saved to {output_path}")
+
+```
+
+![Screenshot3](1.png)
+
+ - **Accuracy Analysis Code Implementation:**
+  The following Python script calculates K-means classification.
+
+  ```python
+!pip install rasterio
+import rasterio
+print("Rasterio imported successfully!")
+from sklearn.cluster import KMeans
+import numpy as np
+import pandas as pd
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+import matplotlib.pyplot as plt
+
+# Wczytaj raster
+raster_path = "/content/raster.tif"
+with rasterio.open(raster_path) as src:
+    raster_data = src.read(1)  # Zakładamy, że raster ma tylko jedną warstwę
+    profile = src.profile
+
+# Sprawdź wartości unikalne (przydatne dla klasyfikacji)
+unique_values = np.unique(raster_data)
+print("Unikalne wartości w rastrze:", unique_values)
+
+ground_truth_data = np.random.choice(unique_values, raster_data.shape)  # Symulacja referencji
+
+
+# Spłaszczanie danych (potrzebne do analizy klasyfikacji)
+flattened_raster = raster_data.flatten()
+flattened_truth = ground_truth_data.flatten()
+
+# Usunięcie wartości NoData (jeśli istnieją, np. -9999)
+mask = (flattened_truth >= 0)  # Dostosuj w zależności od NoData w Twoim rastrze
+flattened_raster = flattened_raster[mask]
+flattened_truth = flattened_truth[mask]
+
+# Obliczenie macierzy błędów
+conf_matrix = confusion_matrix(flattened_truth, flattened_raster)
+print("Macierz błędów:\n", conf_matrix)
+
+# Obliczenie dokładności
+overall_acc = accuracy_score(flattened_truth, flattened_raster)
+print("Ogólna dokładność:", overall_acc)
+
+# Szczegółowy raport klasyfikacji
+report = classification_report(flattened_truth, flattened_raster, zero_division=0)
+print("Raport klasyfikacji:\n", report)
+
+# Wizualizacja macierzy błędów
+plt.figure(figsize=(8, 6))
+plt.imshow(conf_matrix, cmap="Blues", interpolation="nearest")
+plt.colorbar(label="Liczba pikseli")
+plt.xlabel("Przewidywane klasy")
+plt.ylabel("Referencyjne klasy")
+plt.title("Macierz błędów")
+plt.show()
+
+```
+Macierz błędów:
+ [[4079 2320 3226 6818 1297]
+ [4227 2245 3227 6867 1255]
+ [4160 2288 3262 6747 1282]
+ [4308 2258 3293 6850 1292]
+ [4247 2334 3215 6917 1306]]
+
+
+
+ Raport klasyfikacji:
+               precision    recall  f1-score   support
+
+           1       0.19      0.23      0.21     17740
+           3       0.20      0.13      0.15     17821
+           4       0.20      0.18      0.19     17739
+           6       0.20      0.38      0.26     18001
+           8       0.20      0.07      0.11     18019
+
+    accuracy                           0.20     89320
+   macro avg       0.20      0.20      0.19     89320
+weighted avg       0.20      0.20      0.19     89320
+
+
+![Screenshot4](2.png)
+
+
+
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
