@@ -243,7 +243,7 @@ if __name__ == "__main__":
 - **Code Implementation:**
   The following Python script calculates K-means classification.
 
-  ```python
+```python
 
 !pip install rasterio
 import rasterio
@@ -308,7 +308,7 @@ print(f"Classified image saved to {output_path}")
 - **Code Implementation:**
   The following Python script calculates accuracy analysis.
 
-  ```python
+```python
 
 !pip install rasterio
 import rasterio
@@ -392,7 +392,7 @@ weighted avg       0.20      0.20      0.19     89320
 - **Code Implementation:**
   The following Python script calculates accuracy analysis between.
 
-  ```python
+```python
 !pip install rasterio
 print("Rasterio imported successfully!")
 from sklearn.cluster import KMeans
@@ -507,6 +507,7 @@ Kappa Coefficient: 0.5553154406438725
 ![Screenshot3](6.png)
 ![Screenshot4](7.png)
 ![Screenshot5](8.png)
+
 
 - **Notes:**
 - **Issues/Challenges:**
