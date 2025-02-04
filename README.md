@@ -234,6 +234,100 @@ if __name__ == "__main__":
 ```
 ![Screenshot1](task2_budek.jpg)
 
+#Task 1
+
+```python
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Wczytanie plików TIFF
+lst_img_1 = cv2.imread("t1_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+ndvi_img_1 = cv2.imread("t1_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+lst_img_2 = cv2.imread("t2_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+ndvi_img_2 = cv2.imread("t2_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+# Funkcja do wyświetlania obrazów w skali szarości
+def show_grayscale(image, title, ax):
+    ax.imshow(image, cmap='gray')
+    ax.set_title(title)
+    ax.axis('off')
+
+# Wyświetlenie obrazów
+fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+
+show_grayscale(lst_img_1, "LST - Obraz 1", axes[0, 0])
+show_grayscale(ndvi_img_1, "NDVI - Obraz 1", axes[0, 1])
+show_grayscale(lst_img_2, "LST - Obraz 2", axes[1, 0])
+show_grayscale(ndvi_img_2, "NDVI - Obraz 2", axes[1, 1])
+
+plt.tight_layout()
+plt.show()
+
+# Funkcja do normalizacji i konwersji do palety kolorów RGB
+def convert_to_rgb(image):
+    norm_img = cv2.normalize(image, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    colormap = plt.get_cmap('jet')
+    rgb_img = colormap(norm_img)
+    return (rgb_img[:, :, :3] * 255).astype(np.uint8)
+
+# Konwersja obrazów
+rgb_lst_1 = convert_to_rgb(lst_img_1)
+rgb_ndvi_1 = convert_to_rgb(ndvi_img_1)
+rgb_lst_2 = convert_to_rgb(lst_img_2)
+rgb_ndvi_2 = convert_to_rgb(ndvi_img_2)
+
+# Wyświetlenie obrazów RGB
+fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+
+axes[0, 0].imshow(rgb_lst_1)
+axes[0, 0].set_title("RGB LST - Obraz 1")
+axes[0, 1].imshow(rgb_ndvi_1)
+axes[0, 1].set_title("RGB NDVI - Obraz 1")
+axes[1, 0].imshow(rgb_lst_2)
+axes[1, 0].set_title("RGB LST - Obraz 2")
+axes[1, 1].imshow(rgb_ndvi_2)
+axes[1, 1].set_title("RGB NDVI - Obraz 2")
+
+for ax in axes.flat:
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+plt.tight_layout()
+plt.show()
+
+# Funkcja do tworzenia histogramu
+def plot_hist(image, title, ax):
+    ax.hist(image.ravel(), bins=256, color='blue', alpha=0.7)
+    ax.set_title(title)
+    ax.set_xlim(0, 255)
+
+# Tworzenie histogramów
+fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+plot_hist(lst_img_1, "Histogram LST - Obraz 1", axes[0, 0])
+plot_hist(ndvi_img_1, "Histogram NDVI - Obraz 1", axes[0, 1])
+plot_hist(lst_img_2, "Histogram LST - Obraz 2", axes[1, 0])
+plot_hist(ndvi_img_2, "Histogram NDVI - Obraz 2", axes[1, 1])
+
+plt.tight_layout()
+plt.show()
+
+# Funkcja do tworzenia wykresu rozrzutu
+def scatter_plot(ndvi, lst, title, ax):
+    ax.scatter(ndvi.ravel(), lst.ravel(), alpha=0.5, s=1)
+    ax.set_title(title)
+    ax.set_xlabel("NDVI")
+    ax.set_ylabel("LST")
+
+# Tworzenie wykresów rozrzutu
+fig, axes = plt.subplots(1, 2, figsize=(14, 7))
+scatter_plot(ndvi_img_1, lst_img_1, "Wykres rozrzutu - Obraz 1", axes[0])
+scatter_plot(ndvi_img_2, lst_img_2, "Wykres rozrzutu - Obraz 2", axes[1])
+
+plt.tight_layout()
+plt.show()
+```
+
 ### 3.2 Member 2 - Aleksandra Barnach 
 - **Completed Tasks:**
   - [ ] Task 1
