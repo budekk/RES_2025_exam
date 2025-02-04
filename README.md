@@ -47,14 +47,114 @@ perform accuracy analysis using https://github.com/RemoteSys/accuracy
 
 ## 3. Team Members' Results
 
-### 3.1 Member 1 - Full Name
+### 3.1 Member 1 - Bartosz Budek
 - **Completed Tasks:**
-  - [ ] Task 1
-  - [ ] Task 2
-- **Notes:**
-- **Issues/Challenges:**
-- **Plans for the Next Period:**
+  - [x] Task 1
+  - [x] Task 2
+  - [ ] Task 3
 
+
+- **Code Implementation:**
+  The following Python script calculates accuracy metrics.
+
+  ```python
+  !git clone https://github.com/RemoteSys/accuracy.git
+  %cd accuracy
+  !pip install -r requirements.txt
+  !pip install .
+  !accuracy /content/LULC_200_2021.tif
+  !accuracy /content/data2cols.csv
+  !accuracy /content/data2cols.csv -f "ac = (TP * TN - FP * FN) / ((TP + FP) * (TP + FN))**0.5"
+  import pandas as pd
+import numpy as np
+
+df = pd.read_csv("/content/data2cols.csv")
+
+TP = df['TP'].sum()
+TN = df['TN'].sum()
+FP = df['FP'].sum()
+FN = df['FN'].sum()
+
+OA = (TP + TN) / (TP + TN + FP + FN)
+PA = TP / (TP + FN)
+UA = TP / (TP + FP)
+OME = FN / (TP + FN)
+CME = FP / (TP + FP)
+NPV = TN / (TN + FN)
+ACC = (TP + TN) / (TP + TN + FP + FN)
+PPV = TP / (TP + FP)
+TPR = TP / (TP + FN)
+TNR = TN / (TN + FP)
+FNR = FN / (FN + TP)
+FPR = FP / (FP + TN)
+FDR = FP / (FP + TP)
+FOR = FN / (FN + TN)
+TS = TP / (TP + FN + FP)
+MCC = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN))
+BA = (TPR + TNR) / 2
+F1 = 2 * (PPV * TPR) / (PPV + TPR)
+FM = np.sqrt(PPV * TPR)
+BM = TPR + TNR - 1
+MK = PPV + NPV - 1
+
+metrics = {
+    "Overall Accuracy (OA)": OA,
+    "Producer Accuracy (PA)": PA,
+    "User Accuracy (UA)": UA,
+    "Omission Error (OME)": OME,
+    "Commission Error (CME)": CME,
+    "Negative Predictive Value (NPV)": NPV,
+    "Accuracy (ACC)": ACC,
+    "Precision (PPV)": PPV,
+    "Recall (TPR)": TPR,
+    "Specificity (TNR)": TNR,
+    "False Negative Rate (FNR)": FNR,
+    "False Positive Rate (FPR)": FPR,
+    "False Discovery Rate (FDR)": FDR,
+    "False Omission Rate (FOR)": FOR,
+    "Threat Score (TS)": TS,
+    "Matthews Correlation Coefficient (MCC)": MCC,
+    "Balanced Accuracy (BA)": BA,
+    "F1 Score": F1,
+    "Fowlkes-Mallows Index (FM)": FM,
+    "Informedness (BM)": BM,
+    "Markedness (MK)": MK,
+}
+
+for key, value in metrics.items():
+    print(f"{key}: {value:.4f}")
+    
+  import pandas as pd
+
+  df = pd.read_csv("data2cols.csv")
+
+  df["OA"] = df["TP"] / (df["TP"] + df["TN"] + df["FP"] + df["FN"])
+  df["PA"] = df["TP"] / (df["TP"] + df["FN"])
+  df["UA"] = df["TP"] / (df["TP"] + df["FP"])
+
+  df.to_csv("classic_acc.csv", index=False)
+  print("Results saved to classic_acc.csv")
+
+import pandas as pd
+
+file_paths = [
+    "/content/data2cols_results/cross_full.csv",
+    "/content/data2cols_results/binary_cross.csv",
+    "/content/data2cols_results/classic_acc.csv",
+    "/content/data2cols_results/simple_acc.csv",
+    "/content/data2cols_results/complex_acc.csv",
+    "/content/data2cols_results/average_acc.csv"
+]
+
+results = {}
+for path in file_paths:
+    try:
+        df = pd.read_csv(path)
+        results[path] = df.head()  # Wyświetlenie pierwszych kilku wierszy
+    except Exception as e:
+        results[path] = f"Error loading file: {e}"
+
+results
 ---
 
 ### 3.2 Member 2 - Aleksandra Barnach 
