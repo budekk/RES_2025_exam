@@ -236,8 +236,278 @@ if __name__ == "__main__":
 
 ### 3.2 Member 2 - Aleksandra Barnach 
 - **Completed Tasks:**
-  - [ ] Task 3.1
-  - [ ] Task 3.3
+  - [ ] Task 1
+  - [ ] Task 2
+  - [ ] Task 3
+
+- **Code Implementation:**
+  The following Python script calculates K-means classification.
+
+  ```python
+
+!pip install rasterio
+import rasterio
+print("Rasterio imported successfully!")
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+# Ścieżka do pliku
+raster_path = "/content/raster.tif"
+
+# Odczytanie pliku GeoTIFF
+with rasterio.open(raster_path) as src:
+    image = src.read()  # Załaduj wszystkie pasma (bands)
+    profile = src.profile  # Zapisz metadane
+
+# Przekształcenie danych na format 2D (piksele x kanały)
+num_bands, height, width = image.shape
+image_2d = image.reshape(num_bands, -1).T  # Transponowanie dla K-Means
+
+# Usunięcie NaN i wartości zerowych
+valid_pixels = np.all(image_2d > 0, axis=1)
+filtered_data = image_2d[valid_pixels]
+
+# Klasyfikacja K-Means (np. 5 klas)
+kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+kmeans.fit(filtered_data)
+
+# Przypisanie etykiet do pikseli
+labels = np.full(image_2d.shape[0], -1)  # Domyślnie -1 dla odfiltrowanych pikseli
+labels[valid_pixels] = kmeans.labels_
+
+# Rekonstrukcja do oryginalnych wymiarów
+classified_image = labels.reshape(height, width)
+
+# Wizualizacja
+plt.figure(figsize=(10, 10))
+plt.imshow(classified_image, cmap='tab10')
+plt.colorbar(label='Cluster Label')
+plt.title("Sentinel-2 K-Means Classification")
+plt.show()
+
+# Zapis wyników
+output_path = "/content/classified.tif"
+with rasterio.open(
+    output_path, 'w', driver='GTiff',
+    height=height, width=width, count=1,
+    dtype=rasterio.uint8, crs=profile['crs'],
+    transform=profile['transform']
+) as dst:
+    dst.write(classified_image.astype(rasterio.uint8), 1)
+
+print(f"Classified image saved to {output_path}")
+
+
+  ```
+
+![Screenshot1](1.png)
+
+
+
+- **Code Implementation:**
+  The following Python script calculates accuracy analysis.
+
+  ```python
+
+!pip install rasterio
+import rasterio
+print("Rasterio imported successfully!")
+from sklearn.cluster import KMeans
+import numpy as np
+import pandas as pd
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+import matplotlib.pyplot as plt
+
+# Wczytaj raster
+raster_path = "/content/raster.tif"
+with rasterio.open(raster_path) as src:
+    raster_data = src.read(1)  # Zakładamy, że raster ma tylko jedną warstwę
+    profile = src.profile
+
+# Sprawdź wartości unikalne (przydatne dla klasyfikacji)
+unique_values = np.unique(raster_data)
+print("Unikalne wartości w rastrze:", unique_values)
+
+ground_truth_data = np.random.choice(unique_values, raster_data.shape)  # Symulacja referencji
+
+
+# Spłaszczanie danych (potrzebne do analizy klasyfikacji)
+flattened_raster = raster_data.flatten()
+flattened_truth = ground_truth_data.flatten()
+
+# Usunięcie wartości NoData (jeśli istnieją, np. -9999)
+mask = (flattened_truth >= 0)  # Dostosuj w zależności od NoData w Twoim rastrze
+flattened_raster = flattened_raster[mask]
+flattened_truth = flattened_truth[mask]
+
+# Obliczenie macierzy błędów
+conf_matrix = confusion_matrix(flattened_truth, flattened_raster)
+print("Macierz błędów:\n", conf_matrix)
+
+# Obliczenie dokładności
+overall_acc = accuracy_score(flattened_truth, flattened_raster)
+print("Ogólna dokładność:", overall_acc)
+
+# Szczegółowy raport klasyfikacji
+report = classification_report(flattened_truth, flattened_raster, zero_division=0)
+print("Raport klasyfikacji:\n", report)
+
+# Wizualizacja macierzy błędów
+plt.figure(figsize=(8, 6))
+plt.imshow(conf_matrix, cmap="Blues", interpolation="nearest")
+plt.colorbar(label="Liczba pikseli")
+plt.xlabel("Przewidywane klasy")
+plt.ylabel("Referencyjne klasy")
+plt.title("Macierz błędów")
+plt.show()
+
+  ```
+
+Macierz błędów:
+ [[4079 2320 3226 6818 1297]
+ [4227 2245 3227 6867 1255]
+ [4160 2288 3262 6747 1282]
+ [4308 2258 3293 6850 1292]
+ [4247 2334 3215 6917 1306]]
+
+
+Raport klasyfikacji:
+               precision    recall  f1-score   support
+
+           1       0.19      0.23      0.21     17740
+           3       0.20      0.13      0.15     17821
+           4       0.20      0.18      0.19     17739
+           6       0.20      0.38      0.26     18001
+           8       0.20      0.07      0.11     18019
+
+    accuracy                           0.20     89320
+   macro avg       0.20      0.20      0.19     89320
+weighted avg       0.20      0.20      0.19     89320
+
+
+![Screenshot2](2.png)
+
+
+- **Code Implementation:**
+  The following Python script calculates accuracy analysis between.
+
+  ```python
+!pip install rasterio
+print("Rasterio imported successfully!")
+from sklearn.cluster import KMeans
+import pandas as pd
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+import matplotlib.pyplot as plt
+import numpy as np
+import rasterio
+from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import cohen_kappa_score
+from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score, cohen_kappa_score, classification_report
+import numpy as np
+import rasterio
+import matplotlib.pyplot as plt
+
+def load_raster(file_path): 
+    try:
+        with rasterio.open(file_path) as src:
+            return src.read(1), src.profile
+    except Exception as e:
+        print(f"Error loading raster {file_path}: {e}")
+        return None, None
+
+def accuracy_assessment(raster_path, reference_path): 
+    raster, _ = load_raster(raster_path)
+    reference, _ = load_raster(reference_path)
+    
+    if raster is None or reference is None:
+        print("Error: One or both rasters could not be loaded.")
+        return None, None, None
+    
+    # Flatten arrays and remove nodata values (assuming 0 as nodata, modify if needed)
+    mask = (reference > 0) & (raster > 0)
+    
+    if not np.any(mask):
+        print("Error: No valid data found after applying mask.")
+        return None, None, None
+    
+    raster_values = raster[mask].flatten()
+    reference_values = reference[mask].flatten()
+    
+    # Compute confusion matrix and metrics
+    conf_matrix = confusion_matrix(reference_values, raster_values)
+    overall_acc = accuracy_score(reference_values, raster_values)
+    kappa = cohen_kappa_score(reference_values, raster_values)
+    
+    return conf_matrix, overall_acc, kappa
+
+def classify_kmeans(raster, n_clusters=5):
+    masked_values = raster[raster > 0].reshape(-1, 1)  # Przygotowanie danych
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    classified = np.zeros_like(raster)
+    classified[raster > 0] = kmeans.fit_predict(masked_values) + 1  # Klasy od 1
+    return classified
+
+def classify_random_forest(raster, reference):
+    mask = (reference > 0) & (raster > 0)
+    X_train = raster[mask].reshape(-1, 1)
+    y_train = reference[mask].flatten()
+    rf = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf.fit(X_train, y_train)
+    classified = np.zeros_like(raster)
+    classified[raster > 0] = rf.predict(raster[raster > 0].reshape(-1, 1))
+    return classified
+
+# Ścieżki do plików
+raster_path = "/content/raster.tif"
+reference_path = "/content/reference_raster.tif"
+
+# Analiza dokładności
+conf_matrix, overall_acc, kappa = accuracy_assessment(raster_path, reference_path)
+if conf_matrix is not None:
+    print("Confusion Matrix:\n", conf_matrix)
+    print("Overall Accuracy:", overall_acc)
+    print("Kappa Coefficient:", kappa)
+
+    # Wczytanie rastra do klasyfikacji
+    raster, _ = load_raster(raster_path)
+    
+    # Klasyfikacja metodą K-Means
+    classified_kmeans = classify_kmeans(raster)
+    
+    # Klasyfikacja metodą Random Forest
+    reference, _ = load_raster(reference_path)
+    classified_rf = classify_random_forest(raster, reference)
+    
+    # Wizualizacja wyników
+    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+    axs[0].imshow(raster, cmap='gray')
+    axs[0].set_title('Oryginalny raster')
+    axs[1].imshow(classified_kmeans, cmap='jet')
+    axs[1].set_title('Klasyfikacja K-Means')
+    axs[2].imshow(classified_rf, cmap='jet')
+    axs[2].set_title('Klasyfikacja Random Forest')
+    plt.show()
+
+  ```
+
+Confusion Matrix:
+ [[14270   712   696  2178  2119]
+ [  903  7236  1882  1805   214]
+ [  162  1665  8839  2936    68]
+ [ 4544  1798  3884 26910  1119]
+ [ 1142    34   922   370  2912]]
+Overall Accuracy: 0.6736117330944917
+Kappa Coefficient: 0.5553154406438725
+
+
+
+![Screenshot3](6.png)
+![Screenshot4](7.png)
+![Screenshot5](8.png)
+
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
