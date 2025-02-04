@@ -689,6 +689,106 @@ if __name__ == "__main__":
 
 This code imports elevation model (DEM) data and a 3D point cloud in shapefile format, then computes the elevation differences between the DEM values and the points in the cloud. Based on these differences, accuracy metrics such as mean error, RMSE (root mean square error), and standard deviation are derived. The results indicate an average height difference of 4.05 meters, which represents a substantial error. The RMSE of 9.25 meters highlights a significant variation, while the standard deviation of 8.31 meters reveals a broad range of errors across the examined points.
 
+## Task 1 
+
+```
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Loading TIFF files
+image_lst_1 = cv2.imread("t1_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+image_ndvi_1 = cv2.imread("t1_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+image_lst_2 = cv2.imread("t2_lst2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+image_ndvi_2 = cv2.imread("t2_ndvi2023_Jul_Aug.tif", cv2.IMREAD_UNCHANGED)
+
+# Function to display grayscale images
+def display_grayscale(img, title, axis):
+    axis.imshow(img, cmap='gray')
+    axis.set_title(title)
+    axis.axis('off')
+
+# Display grayscale images
+fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+display_grayscale(image_lst_1, "LST Image 1", axes[0, 0])
+display_grayscale(image_ndvi_1, "NDVI Image 1", axes[0, 1])
+display_grayscale(image_lst_2, "LST Image 2", axes[1, 0])
+display_grayscale(image_ndvi_2, "NDVI Image 2", axes[1, 1])
+
+plt.tight_layout()
+plt.show()
+
+# Function to normalize and convert to RGB palette
+def normalize_and_color_map(img):
+    norm_image = cv2.normalize(img, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    color_map = plt.get_cmap('jet')
+    colored_image = color_map(norm_image)
+    return (colored_image[:, :, :3] * 255).astype(np.uint8)
+
+# Converting images to RGB
+rgb_image_lst_1 = normalize_and_color_map(image_lst_1)
+rgb_image_ndvi_1 = normalize_and_color_map(image_ndvi_1)
+rgb_image_lst_2 = normalize_and_color_map(image_lst_2)
+rgb_image_ndvi_2 = normalize_and_color_map(image_ndvi_2)
+
+# Display RGB images
+fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+axes[0, 0].imshow(rgb_image_lst_1)
+axes[0, 0].set_title("RGB LST Image 1")
+axes[0, 1].imshow(rgb_image_ndvi_1)
+axes[0, 1].set_title("RGB NDVI Image 1")
+axes[1, 0].imshow(rgb_image_lst_2)
+axes[1, 0].set_title("RGB LST Image 2")
+axes[1, 1].imshow(rgb_image_ndvi_2)
+axes[1, 1].set_title("RGB NDVI Image 2")
+
+for ax in axes.flat:
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+plt.tight_layout()
+plt.show()
+
+# Function to plot histogram
+def draw_histogram(img, title, axis):
+    axis.hist(img.ravel(), bins=256, color='blue', alpha=0.7)
+    axis.set_title(title)
+    axis.set_xlim(0, 255)
+
+# Creating histograms
+fig, axes = plt.subplots(2, 2, figsize=(14, 14))
+draw_histogram(image_lst_1, "Histogram LST Image 1", axes[0, 0])
+draw_histogram(image_ndvi_1, "Histogram NDVI Image 1", axes[0, 1])
+draw_histogram(image_lst_2, "Histogram LST Image 2", axes[1, 0])
+draw_histogram(image_ndvi_2, "Histogram NDVI Image 2", axes[1, 1])
+
+plt.tight_layout()
+plt.show()
+
+# Function to generate scatter plot
+def generate_scatter_plot(ndvi_image, lst_image, title, axis):
+    axis.scatter(ndvi_image.ravel(), lst_image.ravel(), alpha=0.6, s=1)
+    axis.set_title(title)
+    axis.set_xlabel("NDVI")
+    axis.set_ylabel("LST")
+
+# Creating scatter plots
+fig, axes = plt.subplots(1, 2, figsize=(14, 7))
+generate_scatter_plot(image_ndvi_1, image_lst_1, "Scatter Plot Image 1", axes[0])
+generate_scatter_plot(image_ndvi_2, image_lst_2, "Scatter Plot Image 2", axes[1])
+
+plt.tight_layout()
+plt.show()
+
+```
+![Screenshot1](b1.jpg)
+![Screenshot1](b2.jpg)
+![Screenshot1](b3.jpg)
+![Screenshot1](b4.jpg)
+
 
 - **Notes:**
 - **Issues/Challenges:**
