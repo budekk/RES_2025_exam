@@ -1165,9 +1165,10 @@ The code loads an image from a `.tif` file using the `rasterio` library, convert
 - **Completed Tasks:**
   - [ ] Task 1
   - [ ] Task 2
+  
 #Task 1 in python
 
-
+'''
 Reading files
 
 Displaying images
@@ -1343,10 +1344,11 @@ create_scatter_plot(tif_2_ndvi, tif_2_lst, 'Scatter Plot TIF 2', axs[1])
 
 plt.tight_layout()
 plt.show()
-
+```
 
 #task 1 in matlab
 
+```
 % Open the TIFF files
 tif_1_lst = imread('t1_lst2023_Jul_Aug.tif');
 tif_1_ndvi = imread('t1_ndvi2023_Jul_Aug.tif');
@@ -1405,12 +1407,80 @@ subplot(1, 2, 1);
 create_scatter_plot(tif_1_ndvi, tif_1_lst, 'Scatter Plot TIF 1', gca);
 subplot(1, 2, 2);
 create_scatter_plot(tif_2_ndvi, tif_2_lst, 'Scatter Plot TIF 2', gca);
+```
+  #Task 2
 
-  
+
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
+```
+python
+import rasterio
+import numpy as np
+import geopandas as gpd
 
+
+dem_file_path = path
+point_cloud_file_path = path
+
+# Funkcja do odczytu DEM
+def load_dem(dem_file_path):
+    with rasterio.open(dem_file_path) as dem_file:
+        dem_array = dem_file.read(1)  
+        transform_info = dem_file.transform
+    return dem_array, transform_info
+
+# Funkcja do odczytu chmury punktów
+def load_point_cloud(point_cloud_file_path):
+    point_cloud_df = gpd.read_file(point_cloud_file_path)  
+    return point_cloud_df
+
+# Funkcja do interpolacji wysokości DEM dla podanych współrzędnych
+def get_dem_height_at_coords(dem_array, transform_info, x, y):
+    col, row = ~transform_info * (x, y)  # Przemiana współrzędnych
+    row, col = int(round(row)), int(round(col))
+    if 0 <= row < dem_array.shape[0] and 0 <= col < dem_array.shape[1]:
+        return dem_array[row, col]
+    return np.nan  # Jeśli współrzędne poza zakresem DEM
+
+# Funkcja do obliczania różnic wysokości
+def compute_height_differences(dem_array, transform_info, point_cloud_df):
+    point_cloud_df['DEM_Height'] = point_cloud_df.apply(lambda point: get_dem_height_at_coords(dem_array, transform_info, point.geometry.x, point.geometry.y), axis=1)
+    point_cloud_df['Height_Difference'] = point_cloud_df['Z'] - point_cloud_df['DEM_Height']
+    return point_cloud_df
+
+# Funkcja do obliczania metryk dokładności
+def compute_accuracy_metrics(differences_df):
+    height_diff = differences_df['Height_Difference'].dropna()
+    mean_error = np.mean(height_diff)
+    root_mean_square_error = np.sqrt(np.mean(height_diff ** 2))
+    standard_deviation = np.std(height_diff)
+    return {
+        'Mean Error': mean_error,
+        'RMSE': root_mean_square_error,
+        'Standard Deviation': standard_deviation
+    }
+
+# Funkcja do wyświetlania metryk
+def display_metrics(metrics_dict):
+    print("\n--- Accuracy Metrics ---")
+    for metric, value in metrics_dict.items():
+        print(f"{metric}: {value:.2f} meters")
+
+# Główna funkcja
+def execute_analysis(dem_file_path, point_cloud_file_path):
+    dem_array, transform_info = load_dem(dem_file_path)
+    point_cloud_df = load_point_cloud(point_cloud_file_path)
+    differences_df = compute_height_differences(dem_array, transform_info, point_cloud_df)
+    accuracy_metrics = compute_accuracy_metrics(differences_df)
+    display_metrics(accuracy_metrics)
+    return differences_df, accuracy_metrics
+
+# Uruchomienie programu
+if __name__ == "__main__":
+    execute_analysis(dem_file_path, point_cloud_file_path)
+```
 ---
 
 ## 4. Conclusions and Recommendations
