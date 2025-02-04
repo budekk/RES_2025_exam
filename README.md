@@ -49,8 +49,8 @@ perform accuracy analysis using https://github.com/RemoteSys/accuracy
 
 ### 3.1 Member 1 - Bartosz Budek
 - **Completed Tasks:**
-  - [x] Task 1
-  - [x] Task 2
+  - [ ] Task 1
+  - [ ] Task 2
   - [ ] Task 3
 
 
@@ -158,6 +158,9 @@ for path in file_paths:
 
 results
 ```
+![SYF1](./images/screen1.png)
+![SYF2](./images/screen2.png)
+
 ---
 
 ### 3.2 Member 2 - Aleksandra Barnach 
