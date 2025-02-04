@@ -1168,7 +1168,7 @@ The code loads an image from a `.tif` file using the `rasterio` library, convert
   
 #Task 1 in python
 
-'''
+```
 Reading files
 
 Displaying images
