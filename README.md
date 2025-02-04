@@ -801,10 +801,8 @@ plt.tight_layout()
 plt.show()
 
 ```
-![Screenshot1](b1.jpg)
-![Screenshot1](b2.jpg)
-![Screenshot1](b3.jpg)
-![Screenshot1](b4.jpg)
+![Screenshot1](scr1.png)
+![Screenshot](hist1.png)
 
 
 - **Notes:**
