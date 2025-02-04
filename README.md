@@ -232,6 +232,7 @@ if __name__ == "__main__":
     main(dem_file, point_cloud_file)
 
 ```
+![Screenshot1](task2_budek.jpg)
 
 ### 3.2 Member 2 - Aleksandra Barnach 
 - **Completed Tasks:**
