@@ -1005,6 +1005,56 @@ This code loads data from `.tif` files containing temperature (LST) and NDVI inf
 
 This code loads elevation model (DEM) data and a 3D point cloud in shapefile format, and then calculates the elevation differences between the DEM values and the points in the cloud. From these differences, accuracy metrics such as mean error, RMSE (root mean square error) and standard deviation are calculated. The results show an average height difference of 4.05 meters, which is quite a large error. The RMSE is 9.25 meters, suggesting a significant discrepancy, and the standard deviation of 8.31 meters indicates a wide spread of errors at the analyzed points.
 
+  - [ ] Task 3
+```python
+import numpy as np
+import rasterio
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Ścieżka do pliku .tif
+file_path = r'C:\Users\gabry\Documents\MAGISTERKA\Matlab_python\exam\raster.tif'
+
+# Wczytanie obrazu z pliku .tif
+with rasterio.open(file_path) as src:
+    img_data = src.read()  # Wczytanie wszystkich pasm obrazu (wielokanałowego)
+    transform = src.transform  # Informacje o transformacji przestrzennej
+    metadata = src.meta  # Metadane obrazu
+
+# Konwersja obrazu do formatu 2D (rozpłaszczony macierz danych)
+# Każde pasmo będzie traktowane jako oddzielny kanał
+num_bands, height, width = img_data.shape
+image_2d = img_data.reshape((num_bands, -1)).T  # Przekształcenie do kształtu (ilość pikseli, liczba pasm)
+
+# Normalizacja danych (ważne dla K-Means)
+scaler = StandardScaler()
+image_2d_scaled = scaler.fit_transform(image_2d)
+
+# Zastosowanie K-Means
+num_clusters = 5  # Liczba klastrów (możesz to dostosować)
+kmeans = KMeans(n_clusters=num_clusters, random_state=42)
+labels = kmeans.fit_predict(image_2d_scaled)
+
+# Przekształcenie wyników klasyfikacji z powrotem do kształtu obrazu
+classified_image = labels.reshape((height, width))
+
+# Wyświetlenie wyników
+plt.figure(figsize=(10, 8))
+plt.imshow(classified_image, cmap='viridis')
+plt.colorbar()
+plt.title(f'K-Means Classification with {num_clusters} Clusters')
+plt.show()
+
+# Można zapisać klasyfikowany obraz do nowego pliku .tif
+output_path = r'C:\Users\gabry\Documents\MAGISTERKA\Matlab_python\exam\classified_raster.tif'
+with rasterio.open(output_path, 'w', **metadata) as dst:
+    dst.write(classified_image.astype(rasterio.uint8), 1)
+```
+![image](https://github.com/user-attachments/assets/5fab2ea6-8e43-4d10-8386-f21bd5f8372d)
+
+The code loads an image from a `.tif` file using the `rasterio` library, converts the data to 2D format (where each pixel is represented as a vector of spectral values from different image bands) and normalizes it using `StandardScaler` to prepare it for the K-Means algorithm. Then, using the K-Means algorithm, the image is classified into a specified number of clusters. The result of the classification is transformed back into an image shape and displayed using `matplotlib`. Finally, the classified image is saved to a new `.tif` file.
+
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
