@@ -255,8 +255,8 @@ import numpy as np
 import geopandas as gpd
 
 
-dem_file_path = "C:/Projekty/exam/DEM/Lubin_2024_03_27.asc"
-point_cloud_file_path = "C:/Projekty/exam/Lubin_2024_03_27_pc_t2.shp"
+dem_file_path = path
+point_cloud_file_path = path
 
 # Funkcja do odczytu DEM
 def load_dem(dem_file_path):
@@ -314,15 +314,13 @@ def execute_analysis(dem_file_path, point_cloud_file_path):
 # Uruchomienie programu
 if __name__ == "__main__":
     execute_analysis(dem_file_path, point_cloud_file_path)
-
-
-```python
+```
 
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
 
----
+
 
 ### 3.4 Member 4 - Gabriela Bebak
 - **Completed Tasks:**
@@ -393,6 +391,7 @@ if __name__ == "__main__":
 ``
   
 ![image](https://github.com/user-attachments/assets/ad29c30e-c511-464d-a10c-5eedc9d92a4b)
+
 This code loads elevation model (DEM) data and a 3D point cloud in shapefile format, and then calculates the elevation differences between the DEM values and the points in the cloud. From these differences, accuracy metrics such as mean error, RMSE (root mean square error) and standard deviation are calculated. The results show an average height difference of 4.05 meters, which is quite a large error. The RMSE is 9.25 meters, suggesting a significant discrepancy, and the standard deviation of 8.31 meters indicates a wide spread of errors at the analyzed points.
 
 - **Notes:**
