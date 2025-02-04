@@ -343,6 +343,10 @@ plt.show()
 - **Code Implementation for Task3:**
   The following Python script calculates K-means classification.
 
+This code reads a GeoTIFF raster image, reshapes it into a 2D array, and applies the K-Means clustering algorithm to classify the pixels into 5 clusters. It filters out invalid or zero values before clustering, then reconstructs the classified image back to its original dimensions. The result is visualized using a color map, and the classified image is saved as a new GeoTIFF file.
+
+
+
 ```python
 
 !pip install rasterio
@@ -407,6 +411,8 @@ print(f"Classified image saved to {output_path}")
 
 - **Code Implementation:**
   The following Python script calculates accuracy analysis.
+
+This code performs a classification accuracy assessment on raster data. It first reads a raster image and extracts the unique pixel values. It then simulates ground truth reference data for comparison. After flattening both the raster data and reference data, it removes any NoData values. The code computes the confusion matrix, overall accuracy, and a detailed classification report. Finally, it visualizes the confusion matrix using a color map to display the classification performance. The results provide insights into how well the raster data matches the reference ground truth data.
 
 ```python
 
@@ -491,6 +497,8 @@ weighted avg       0.20      0.20      0.19     89320
 
 - **Code Implementation:**
   The following Python script calculates accuracy analysis between.
+
+This code loads two raster files: one representing a classified image and the other serving as a reference for accuracy assessment. It includes functions to load the raster data, calculate classification accuracy using metrics like confusion matrix, overall accuracy, and Kappa coefficient, and then performs two classification methods: K-Means clustering and Random Forest classification. The K-Means algorithm classifies the raster data into a specified number of clusters, while the Random Forest classifier uses the reference raster for training and prediction. The results of both classification methods, along with the original raster, are visualized using different color maps (`'gray'`, `'viridis'`, and `'plasma'`).
 
 ```python
 !pip install rasterio
