@@ -183,10 +183,12 @@ results
 
 ---
 
-### 3.4 Member 4 - Full Name
+### 3.4 Member 4 - Gabriela Bebak
 - **Completed Tasks:**
   - [ ] Task 1
   - [ ] Task 2
+  - [ ] ![image](https://github.com/user-attachments/assets/ad29c30e-c511-464d-a10c-5eedc9d92a4b)
+
 - **Notes:**
 - **Issues/Challenges:**
 - **Plans for the Next Period:**
